@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<script src="jquery-1.11.0.min.js"></script>
+<script>
+var alto = window.innerHeight;
+var ancho = window.innerWidth;
+var anchoO = ancho / 20;
+var altoO = alto / 20;
+var creX = ancho / 500;
+var creY = alto / 500;
+var contador = 0;
+var cuantos = 50;
+var divsX=new Array();
+var divsY=new Array();
+var aux1 = alto / 2;
+var aux2 = ancho / 2;
+
+
+
+$(document).ready(function(e) {
+    
+	for(var i = 0; i < cuantos; i ++){
+		divsX[i] = i * anchoO;
+		divsY[i] = i * altoO;
+	} 
+	for(var i = 0; i < cuantos; i ++){
+		
+	    $("body").append("<div id='d"+i+"'></div>");
+		$("#d"+i).css("width",divsX[i]+"px");
+		$("#d"+i).css("height",divsY[i]+"px");
+		$("#d"+i).css("top",aux1-(divsX[i]/2)+"px");
+		$("#d"+i).css("left",aux2-(divsY[i]/2)+"px");	
+	}
+	setInterval("mov()", 40);
+});
+
+function mov(){
+	for(var i = 0; i < cuantos; i ++){
+		divsX[i] += creX;
+		divsY[i] += creY;
+		if(divsX[i] > ancho){
+			divsX[i] = 0;
+			}
+	    if(divsY[i] > alto){
+			divsY[i] = 0;
+			}
+	
+		$("#d"+i).css("width",divsX[i]+"px");
+		$("#d"+i).css("height",divsY[i]+"px");
+	    $("#d"+i).css("top",aux1-(divsY[i]/2)+"px");
+	    $("#d"+i).css("left",aux2-(divsX[i]/2)+"px");
+	} 
+	
+	
+	
+	
+	
+			
+			 
+	}
+
+
+
+
+
+
+</script>
+<style>
+body * {overflow:scroll; position:absolute};
+</style>
+</head>
+
+<body>
+</body>
+</html>

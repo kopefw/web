@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>FelipeWeason</title>
+		
+		<meta property="og:url" content="http://www.felipeweason.info" />
+		<meta property="og:title" content="Felipe Weason" />
+		<meta property="og:description" content="try jump - 2017" />
+		<meta property="og:image" content="http://www.felipeweason.info/colchon.jpg" />
+	
+		<!--<link rel="icon" type="image/x-icon" href="http://www.vanoeditorial.cl/favicon.ico" />-->
+
+		<link rel="stylesheet" href="TemplateData/style.css">
+		
+		<script src="TemplateData/UnityProgress.js"></script>
+	</head>
+	<body class="template">
+
+		<div class="template-wrap clear">
+			<canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+		</div>
+
+		<script type='text/javascript'>
+			var Module = {
+				TOTAL_MEMORY: 268435456,
+				errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
+				compatibilitycheck: null,
+				dataUrl: "Release/jumPVoid_html5.data",
+				codeUrl: "Release/jumPVoid_html5.js",
+				memUrl: "Release/jumPVoid_html5.mem",
+
+			};
+		</script>
+		<script src="Release/UnityLoader.js"></script>
+
+	</body>
+</html>

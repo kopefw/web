@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="js/face-api.js?v=0.2"></script>
+  <script src="js/faceDetectionControls.js?v=0.2"></script>
+  <link rel="stylesheet" href="styles.css?v=0.2">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+  <div class="center-content page-container">
+    <div class="progress" id="loader">
+      <div class="indeterminate"></div>
+    </div>
+    <div style="position: relative" class="margin">
+      <video onloadedmetadata="onPlay(this)" id="inputVideo" autoplay muted playsinline loop></video>
+      <canvas id="overlay" />
+    </div>
+  </div>
+  <div>
+    <input type="file" id="file" >
+    <br><span> or </span><br>
+    <input type="button" value="webcam" id="enviar" onclick="selWebcam()" >
+    <br><br>
+		<div class="select">
+			<label for="videoSource">Video source: </label>
+			<select id="videoSource"></select>
+		</div>
+	
+
+
+    <input type="button" value="Play" id="enviar" onclick="changeSrc();" >
+    <span> / </span>
+    <input type="button" value="Stop" id="enviar" onclick="stopVideo();" >
+    <br><br>
+    
+  </div>
+  <div>
+  </div>
+</body>
+
+  <script>
+
+    let urlData = document.createElement("a");
+    urlData.href = document.documentURI;
+    console.log(urlData.origin);
+
+    let forwardTimes = []
+    let withBoxes = true
+    let millis = 0;
+
+    function onChangeHideBoundingBoxes(e) {
+      withBoxes = !$(e.target).prop('checked')
+    }
+
+    function updateTimeStats(timeInMs) {
+    }
+
+    async function onPlay() {
+      const videoEl = $('#inputVideo').get(0)
+
+      if(videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded())
+        return setTimeout(() => onPlay())
+
+      const options = getFaceDetectorOptions()
+      const ts = Date.now()
+      const result = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
+
+      updateTimeStats(Date.now() - ts)
+
+      if (result) {
+        const canvas = $('#overlay').get(0)
+        const dims = faceapi.matchDimensions(canvas, videoEl, true)
+        if(result.expressions.happy > 0.98)
+        {
+          saveFrame(result)
+        }
+        const resizedResult = faceapi.resizeResults(result, dims)
+        const minConfidence = 0.05
+        if (withBoxes) {
+          faceapi.draw.drawDetections(canvas, resizedResult)
+        }
+        faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence)
+      }
+
+      setTimeout(() => onPlay())
+    }
+
+    let webcam = false;
+
+    async function run(src) {
+      await changeFaceDetector(TINY_FACE_DETECTOR);
+      await faceapi.loadFaceExpressionModel('/');
+      const videoEl = $('#inputVideo').get(0);
+      if(webcam)
+      {
+        //const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+				await getStream().then(getDevices).then(gotDevices);
+        //videoEl.srcObject = stream;
+      }
+      else
+      {
+        videoEl.setAttribute("src", src);
+      }
+    }
+
+    function updateResults() {}
+
+    $(document).ready(function() {
+
+      initFaceDetectionControls()
+    })
+
+    let imgIndex = 0;
+    function saveFrame(result)
+    {
+      let videoEl = $('#inputVideo').get(0)
+      let dims = {
+        width : videoEl.videoWidth,
+        height : videoEl.videoHeight
+      };
+
+      let resizedResult = faceapi.resizeResults(result, dims);
+      console.log(resizedResult)
+      let canvas = document.createElement("canvas");
+      
+      let d = resizedResult.detection;
+      console.log(d);
+      canvas.width = d._box._width;
+      canvas.height = d._box._height;
+
+      let ctx = canvas.getContext('2d');
+      ctx.drawImage(videoEl, d._box._x, d._box._y, d._box._width, d._box._height,0,0,d._box._width,d._box._height);
+      
+      let link = document.createElement('a');
+      if(webcam)
+        link.download = 'streamer via webcam '+ + imgIndex +'.png';
+      else
+        link.download = 'streamer '+ document.getElementById("file").files[0].name + imgIndex +'.png';
+
+      link.href = canvas.toDataURL();
+      link.click();
+      link.delete;
+      canvas.delete;
+      imgIndex++;
+    }
+
+    function changeSrc()
+    {
+      const file = document.getElementById("file");
+      let videoEl = $('#inputVideo').get(0);
+      let src = null;
+      if(file.files[0])
+      {
+        src = URL.createObjectURL(file.files[0]);
+        console.log(file.files[0]);
+      }
+      run(src);
+    }
+
+    function stopVideo()
+    {
+      let videoEl = $('#inputVideo').get(0);
+      videoEl.pause();
+    }
+
+		let videoElement = document.querySelector('video');
+		let videoSelect = document.querySelector('select#videoSource');
+
+		function selWebcam()
+		{
+			webcam = true; 
+			console.log(webcam);
+			run("");
+		}
+
+		function getDevices() {
+			// AFAICT in Safari this only gets default devices until gUM is called :/
+			return navigator.mediaDevices.enumerateDevices();
+		}
+
+		function gotDevices(deviceInfos) {
+			window.deviceInfos = deviceInfos; // make available to console
+			console.log('Available input and output devices:', deviceInfos);
+			
+			for (const deviceInfo of deviceInfos) {
+					const option = document.createElement('option');
+					option.value = deviceInfo.deviceId;
+				if (deviceInfo.kind === 'videoinput') {
+					option.text = deviceInfo.label || `Camera ${videoSelect.length + 1}`;
+					videoSelect.appendChild(option);
+				}
+			}
+		}
+		function getStream() {
+			if (window.stream) {
+				window.stream.getTracks().forEach(track => {
+					track.stop();
+				});
+			}
+	
+				const videoSource = videoSelect.value;
+				const constraints = {
+					video: {deviceId: videoSource ? {exact: videoSource} : undefined}
+				};
+
+				return navigator.mediaDevices.getUserMedia(constraints).then(gotStream).catch(handleError);
+		}
+
+		function gotStream(stream) {
+			window.stream = stream; // make stream available to console
+			videoSelect.selectedIndex = [...videoSelect.options].findIndex(option => option.text === stream.getVideoTracks()[0].label);
+			videoElement.srcObject = stream;
+		}
+		function handleError(error) {
+			console.error('Error: ', error);
+		}
+
+
+  </script>
+</body>
+</html>

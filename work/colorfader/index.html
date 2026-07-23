@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="yast 4 fan" />
+<title>color fader</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" type="text/javascript"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+<style type="text/css">
+#contenedor {
+	height: 305px;
+	width: 150px;
+	margin-top: 20%;
+	margin-right: auto;
+	margin-left: auto;
+}
+#contenedor .cfader {
+	float: left;
+	height: 305px;
+	width: 50px;
+	background-image:url(ff.jpg);
+	background-repeat:repeat-y;
+	background-position:center;
+}
+#contenedor .cfader .cuadro {
+	height: 50px;
+	width: 50px;
+	position:relative;
+	background-image:url(f.jpg);
+	background-position:center;
+	background-repeat:no-repeat;
+	top:255px;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div id="contenedor">
+
+<div class="cfader"><div id="red" class="cuadro ui-widget-content"></div></div>
+<div class="cfader"><div id="blue" class="cuadro ui-widget-content"></div></div>
+<div class="cfader"><div id="yellow" class="cuadro ui-widget-content"></div></div>
+
+
+</div>
+<img src="por.png" style="display:none" />
+<script>
+$(function() {
+		$( "#red" ).draggable({ containment: "parent" });
+		$( "#blue" ).draggable({ containment: "parent" });
+		$( "#yellow" ).draggable({ containment: "parent" });
+	});
+
+var posr = 0;
+var posb = 0;
+var posy = 0; 
+  
+    $("body").mousemove(function(e){
+		posr = $("#red").css("top");
+		posr = posr.replace(/\D/g, '');
+		posr = parseInt(posr, 10);
+		return posr;
+    });
+	 $("body").mousemove(function(e){
+		posb = $("#blue").css("top");
+		posb = posb.replace(/\D/g, '');
+		posb = parseInt(posb, 10);
+		return posb;
+    });
+
+ $("body").mousemove(function(e){
+		posy = $("#yellow").css("top");
+		posy = posy.replace(/\D/g, '');
+		posy = parseInt(posy, 10);
+		return posy;
+    });
+
+$("body").mousemove(function(e){
+	
+	
+	if (isNaN(posb)){
+	posb = 255;
+	}
+	
+	if (isNaN(posr)){
+	posr = 255;
+	}
+	
+	if (isNaN(posy)){
+	posy = 255;
+	}
+	$("body").css("background-color" , "rgb("+ posr +","+posb+","+posy+")");
+ 	
+	
+	});
+
+	
+	    
+    
+    
+    
+</script>
+<span></span>
+</body>
+</html>
