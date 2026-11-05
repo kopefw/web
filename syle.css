@@ -121,3 +121,25 @@ iframe{
     line-height: 15px;
     text-indent: 20px;
 }
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 768px) {
+    #presentacion
+    {
+        width: 80%;
+    }
+}
+
+
+/*
+@media only screen and (min-width: 600px) {...}
+
+
+@media only screen and (min-width: 768px) {...}
+
+
+@media only screen and (min-width: 992px) {...}
+
+
+@media only screen and (min-width: 1200px) {...}
+*/
